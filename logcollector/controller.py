@@ -126,6 +126,9 @@ class HostProxy(object):
         self.active_hosts = active_hosts
         self.exec_queue = exec_queue
         self.driver = importutils.import_object(CONF.collector_driver)
+
+        # Recovery mechanism - to recreate semaphores for hosts that
+        # were active prior the service restart.
         self._init_acitve_hosts()
 
     def _init_acitve_hosts(self):
@@ -134,7 +137,7 @@ class HostProxy(object):
             self.active_hosts[host.id] = eventlet.semaphore.Semaphore()
             self.active_hosts[host.id].aquire()
 
-    def is_local(host):
+    def _is_host_local(host):
         ip_addrs = []
         for dev in netifaces.interfaces():
             if netifaces.AF_INET in netifaces.ifaddresses(dev):
@@ -143,20 +146,20 @@ class HostProxy(object):
         return host in ip_addrs
 
     def collect(self, host, taskID):
-        if is_localhost():
+        if _is_host_local(host):
             self._local_collect(host, taskID)
         elif CONF.isAsync():
             self._send_async_collect(host, taskID)
         else:
             self._sync_collect(host, taskID)
 
-    def _local_collect(host, taskID):
+    def _local_collect(targetHost, taskID):
         host_obj = self.db_api.get_host(targetHost)
         if not host_obj.id in self.active_hosts:
             self.active_hosts[host_obj.id] = eventlet.semaphore.Semaphore()
+
         with self.active_hosts[host_obj.id]:
             self.db_api.update_host(host_obj.id, {'task': taskID})
-
             local_command_args = self.driver.prepareLocal(tmpDir='/tmp')
             self.exec_queue.put(LocalCommand(local_command_args))
 
@@ -164,6 +167,7 @@ class HostProxy(object):
         host_obj = self.db_api.get_host(targetHost)
         if not host_obj.id in self.active_hosts:
             self.active_hosts[host_obj.id] = eventlet.semaphore.Semaphore()
+
         self.active_hosts[host_obj.id].aquire()
         self.db_api.update_host(host_obj.id, {'task': taskID})
 
