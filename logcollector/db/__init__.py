@@ -12,32 +12,4 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from oslo.config import cfg
-from logcollector.openstack.common import importutils
-
-CONF = cfg.CONF
-CONF.import_opt()
-
-
-def get_api():
-    return importutils.import_module(CONF.data_api)
-
-
-def unwrap(db_api):
-    return db_api
-
-
-class Hosts(object):
-
-    def __init__(self, context, db_api):
-        self.context = context
-        self.db_api = db_api
-
-
-class Tasks(object):
-
-    def __init__(self, context, db_api, image):
-        self.context = context
-        self.db_api = db_api
-        self.image = image
-
+from logcollector.db.api import *  # noqa
