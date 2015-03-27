@@ -1,0 +1,7 @@
+[run]
+branch = True
+source = openstack-logcollector
+omit = openstack-logcollector/tests/*,openstack-logcollector/openstack/*
+
+[report]
+ignore-errors = True

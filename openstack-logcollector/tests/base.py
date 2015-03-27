@@ -1,4 +1,7 @@
-# Copyright (C) 2013 eNovance SAS <licensing@enovance.com>
+# -*- coding: utf-8 -*-
+
+# Copyright 2010-2011 OpenStack Foundation
+# Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -11,25 +14,10 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-======================
-Openstack LogCollector
-======================
 
-Openstack LogCollector is
+from oslotest import base
 
 
-Features
---------
+class TestCase(base.BaseTestCase):
 
-The application spans 
-
-TODO
-----
-
-* Add a callback when the host completed the log collection.
-* Filter host by activity
-* Filter host by region
-* Filter host by IP address
-* Filter host by cells
-* Filter host by aggregates
-
+    """Test case base class for all unit tests."""
